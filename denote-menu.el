@@ -226,9 +226,19 @@ following rule derived from the file naming scheme:
   (let* ((title (if (or (not (string-match-p "--" path)))
                    (propertize "(No Title)" 'face 'font-lock-comment-face)
                   (denote-retrieve-filename-title path)))
+         (signature (denote-retrieve-filename-signature path))
          (file-type (propertize (concat "." (denote-menu-type path)) 'face 'font-lock-keyword-face)))
     (if denote-menu-show-file-type
-        (concat title " " file-type)
+        (cond ((>= 1 (length signature))
+               (concat " " title " " file-type))
+              ((= 2 (length signature))
+               (concat "├─► " title " " file-type))
+              ((<= 3 (length signature))
+               (concat (make-string
+                        (+ (- (length signature) 3)
+                           (length signature))
+                        ? )
+                       "╰─► " title " " file-type)))
       title)))
 
 (defun denote-menu-filter (regexp)
